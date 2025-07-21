@@ -1,0 +1,70 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Compiled output
+dist/
+build/
+out/
+
+# Electron packaging
+release/
+*.asar
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# VSCode settings
+.vscode/
+
+# OS junk
+*.swp
+*.swo
+*~
+
+# Electron rebuild artifacts
+electron-rebuild-*
+
+# Cache
+.cache/
+.nyc_output/
+coverage/
+__pycache__/
+*.tsbuildinfo
+
+# macOS application bundles
+*.app
+
+# Windows executables
+*.exe
+*.dll
+
+# Linux binaries
+*.snap
+*.deb
+*.rpm
+*.AppImage
+
+# Optional: Ignore user/session-specific app data
+userdata/
+session.json
+
+# Optional: Ignore Electron Forge config (if used)
+.forge/
