@@ -27,7 +27,7 @@ const seshCookie = 'PHPSESSID';
 // Main window
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1100,
     height: 900,
     icon: path.join(__dirname, 'assets', 'implant.ico'),
     webPreferences: {
@@ -78,6 +78,32 @@ function createWindow() {
     mainWindow = null;
   });
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    const childWindow = new BrowserWindow({
+      parent: mainWindow,
+      show: true,
+      width: 800,
+      height: 600,
+      icon: path.join(__dirname, 'assets', 'implant.ico'),
+      autoHideMenuBar: true,
+      webPreferences: {
+        nodeIntegration: false,
+      }
+    });
+
+    childWindow.loadURL(url);
+
+    // Close child window with the main window
+    mainWindow.on('closed', () => {
+      if (childWindow && !childWindow.isDestroyed()) {
+        childWindow.close();
+      }
+    });
+
+    return { action: 'deny' };
+  });
+
+
 }
 
 
@@ -86,14 +112,301 @@ function createWindow() {
 function buildMenu(username) {
   return Menu.buildFromTemplate([
     {
+      label: 'Outpost',
+      submenu: [
+        // Inventory
+        {
+          label: 'Inventory && Equipment',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=25');
+            }
+          }
+        },
+
+        { type: 'separator' },
+
+        // Bank
+        {
+          label: 'Bank',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=15');
+            }
+          }
+        },
+
+        // Crafting
+        {
+          label: 'Crafting',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=59');
+            }
+          }
+        },
+
+        // Credit Shop
+        {
+          label: 'Credit Shop',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=28');
+            }
+          }
+        },
+
+        // Marketplace
+        {
+          label: 'Marketplace',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=35');
+            }
+          }
+        },
+
+        // Storage
+        {
+          label: 'Storage',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=50');
+            }
+          }
+        },
+
+        // The Yard
+        {
+          label: 'The Yard',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=24');
+            }
+          }
+        },
+
+        { type: 'separator' },
+
+        // Clan HQ
+        {
+          label: 'Clan HQ',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=56');
+            }
+          }
+        },
+
+        // Fast Travel
+        {
+          label: 'Fast Travel',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=61');
+            }
+          }
+        },
+
+        // Gambling Den
+        {
+          label: 'Gambling Den',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=49');
+            }
+          }
+        },
+
+        // Meeting Hall
+        {
+          label: 'Meeting Hall',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=forum');
+            }
+          }
+        },
+
+        // Records
+        {
+          label: 'Records',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=22');
+            }
+          }
+        },
+      ]
+    },
+    {
+      label: 'Account',
+      submenu: [
+        username ? { label: `Signed in as: ${username}`, enabled: false } : { label: 'Not signed in', enabled: false },
+
+        // Messages
+        {
+          label: 'Messages',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=pm');
+            }
+          }
+        },
+
+        // Challenges
+        {
+          label: 'Challenges',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=62');
+            }
+          }
+        },
+
+        // Masteries
+        {
+          label: 'Masteries',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=81');
+            }
+          }
+        },
+
+        { type: 'separator' },
+
+        // Profile Summary
+        {
+          label: 'Summary',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=summary');
+            }
+          }
+        },
+
+        // Stats
+        {
+          label: 'Show Stats',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=statPanel');
+            }
+          }
+        },
+
+        // Posts
+        {
+          label: 'Show Posts',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=showPosts');
+            }
+          }
+        },
+
+        // Collection
+        {
+          label: 'Collection Book',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=82');
+            }
+          }
+        },
+
+        { type: 'separator' },
+        
+        // Account settings
+        {
+          label: 'Account Settings',
+          enabled: !!username,
+          submenu: [
+            {
+              label: 'Edit Account Settings',
+              enabled: !!username,
+              click: () => {
+                if (username && mainWindow) {
+                  mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=account');
+                }
+              }
+            },
+            {
+              // 2FA
+              label: '2FA Settings',
+              enabled: !!username,
+              click: () => {
+                if (username && mainWindow) {
+                  mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=85');
+                }
+              }
+            }
+          ]
+        },
+
+
+        // Profile settings
+        {
+          label: 'Profile Settings',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=forumProfile');
+            }
+          }
+        },
+
+        // Buddies
+        {
+          label: 'Friends',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=editBuddies');
+            }
+          }
+        },
+
+        { type: 'separator' },
+        {
+          label: 'Switch Accounts', enabled: false,
+          submenu: [
+            { label: 'No Added Acccounts', enabled: false },
+            { type: 'separator' },
+            { label: 'Add New Account', click: () => addNewAccount() }
+          ]
+        },
+        { label: 'Logout', click: logout },
+      ]
+    },
+    {
       label: 'Tools',
       submenu: [
+        // Boss Map
         {
           label: 'Boss Map',
           click: () => {
-            const { BrowserWindow } = require('electron');
-
-            // If window exists and is not destroyed, close it
+            // If window exists and focus it
             if (bossMapWindow && !bossMapWindow.isDestroyed()) {
               bossMapWindow.focus();
             } else {
@@ -101,13 +414,14 @@ function buildMenu(username) {
               bossMapWindow = new BrowserWindow({
                 width: 800,
                 height: 700,
+                icon: path.join(__dirname, 'assets', 'implant.ico'),
                 title: 'Boss Map',
+                autoHideMenuBar: true,
                 webPreferences: {
                   nodeIntegration: false
                 }
               });
 
-              bossMapWindow.setMenuBarVisibility(false);
               bossMapWindow.loadURL(profilerUrl);
 
               // When the page finishes loading
@@ -152,13 +466,12 @@ function buildMenu(username) {
             }
           }
         },
-        { type: 'separator' },
+
+        // Wiki
         {
           label: 'Wiki',
           click: () => {
-            const { BrowserWindow } = require('electron');
-
-            // If window exists and is not destroyed, close it
+            // If window exists focus it
             if (wikiWindow && !wikiWindow.isDestroyed()) {
               wikiWindow.focus();
             } else {
@@ -166,13 +479,14 @@ function buildMenu(username) {
               wikiWindow = new BrowserWindow({
                 width: 1000,
                 height: 700,
+                icon: path.join(__dirname, 'assets', 'implant.ico'),
                 title: 'Wiki',
+                autoHideMenuBar: true,
                 webPreferences: {
                   nodeIntegration: false
                 }
               });
 
-              wikiWindow.setMenuBarVisibility(false);
               wikiWindow.loadURL(wikiLink);
 
               wikiWindow.on('closed', () => {
@@ -184,40 +498,22 @@ function buildMenu(username) {
       ]
     },
     {
-      label: 'Account',
-      submenu: [
-        username 
-          ? { label: `Signed in as: ${username}`, enabled: false } 
-        : { label: 'Not signed in', enabled: false },
-        {
-          label: 'Switch Accounts',
-          submenu: [
-            { label: 'No Added Acccounts', enabled: false },
-            { type: 'separator' },
-            { label: 'Add New Account', click: () => addNewAccount() }
-          ]
-        },
-        { type: 'separator' },
-        { label: 'Logout', click: logout },
-      ]
-    },
-    {
       label: 'Help',
       submenu: [
         {
           label: 'FAQ',
           click: () => {
-            const { BrowserWindow } = require('electron');
-
-            // If window exists and is not destroyed, close it
+            // If window exists focus it
             if (faqWindow && !faqWindow.isDestroyed()) {
               faqWindow.focus();
             } else {
               // Create new window
               faqWindow = new BrowserWindow({
+                parent: mainWindow,
                 width: 1000,
                 height: 700,
                 title: 'FAQ',
+                autoHideMenuBar: true,
                 webPreferences: {
                   nodeIntegration: false
                 }
@@ -235,17 +531,17 @@ function buildMenu(username) {
         {
           label: 'Contact Support',
           click: () => {
-            const { BrowserWindow } = require('electron');
-
-            // If window exists and is not destroyed, close it
+            // If window exists focus it
             if (supportWindow && !supportWindow.isDestroyed()) {
               supportWindow.focus();
             } else {
               // Create new window
               supportWindow = new BrowserWindow({
+                parent: mainWindow,
                 width: 1000,
                 height: 700,
                 title: 'Support',
+                autoHideMenuBar: true,
                 webPreferences: {
                   nodeIntegration: false
                 }
@@ -316,10 +612,40 @@ app.whenReady().then(() => {
           if (cookies.length > 0) {
             const username = cookies[0].value;
             console.log('Username from cookie:', username);
+
             const menu = buildMenu(username);
-            // const account = buildMenu(account);
             Menu.setApplicationMenu(menu);
-          } else {
+
+            if (currentUrl.includes('page=21')) {
+              console.log('Leaving outpost');
+
+              mainWindow.webContents.executeJavaScript(`
+                (function() {
+                  const btn = document.querySelector('button[onclick]');
+                  return btn ? btn.getAttribute('onclick') : null;
+                })();
+              `).then(onclickValue => {
+                if (onclickValue) {
+                  console.log(onclickValue);
+                  // Extract the URL from the onclick string
+                  const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/);
+                  if (match) {
+                    const extractedUrl = match[1];
+                    console.log('Extracted URL:', extractedUrl);
+                    mainWindow.loadURL(extractedUrl);
+
+                  } else {
+                    console.log('No URL matched in onclick value.');
+                  }
+                } else {
+                  console.log('Button or onclick not found.');
+                }
+              }).catch(err => {
+                console.error('Error while executing JS:', err);
+              });
+            }
+          }
+          else {
             console.log('Cookie not found');
             const menu = buildMenu(null);
             Menu.setApplicationMenu(menu);
@@ -330,6 +656,8 @@ app.whenReady().then(() => {
       }, 1000);
     } else {
       console.log('Did not match target URL, skipping cookie check.');
+      const menu = buildMenu(null);
+      Menu.setApplicationMenu(menu);
     }
   });
 });
