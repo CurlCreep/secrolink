@@ -16,6 +16,7 @@ let statsWindow = null;
 let wardrobeWindow = null;
 let damageTableWidow = null;
 let statisticsWindow = null;
+let boostCalcWindow = null;
 
 // URLS
 const url = 'https://fairview.deadfrontier.com';
@@ -23,6 +24,7 @@ const lastUserUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo';
 const wikiLink = 'https://deadfrontier.fandom.com/wiki/Dead_Frontier_Wiki';
 const faqLink = 'https://support.deadfrontier.com/kb';
 const supportLink = 'https://support.deadfrontier.com/discussion/new';
+const guideUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=17';
 
 // DFprofiler URLs
 const profilerBossUrl = 'https://www.dfprofiler.com/bossmap';
@@ -31,6 +33,9 @@ const profilerStatsUrl = 'https://www.dfprofiler.com/statcalculator';
 const profilerWardrobeUrl = 'https://www.dfprofiler.com/wardrobe';
 const profilerDamageTableUrl = 'https://www.dfprofiler.com/damage';
 const profilerStatisticsUrl = 'https://www.dfprofiler.com/statistics';
+
+// DF Buddy URL
+boostCalcUrl = 'https://dfbuddy.com/boostcalculator/';
 
 
 // Outpost URLs
@@ -132,6 +137,9 @@ function createWindow() {
     }
     if (statisticsWindow && !statisticsWindow.isDestroyed()) {
       statisticsWindow.close();
+    }
+    if (boostCalcWindow && !boostCalcWindow.isDestroyed()) {
+      boostCalcWindow.close();
     }
     mainWindow = null;
   });
@@ -762,6 +770,53 @@ function buildMenu(username) {
           ]
         },
 
+        // DF Buddy Boost Calculator
+        {
+          label: 'Boosts Calculator',
+          click: () => {
+            // If window exists focus it
+            if (boostCalcWindow && !boostCalcWindow.isDestroyed()) {
+              boostCalcWindow.focus();
+            } else {
+              // Create new window
+              boostCalcWindow = new BrowserWindow({
+                width: 1000,
+                height: 700,
+                icon: path.join(__dirname, 'assets', 'icon.ico'),
+                title: 'Boosts Calculator',
+                autoHideMenuBar: true,
+                webPreferences: {
+                  nodeIntegration: false
+                }
+              });
+
+              boostCalcWindow.loadURL(boostCalcUrl);
+
+              boostCalcWindow.webContents.on('did-finish-load', () => {
+                boostCalcWindow.webContents.executeJavaScript(`
+                  const section = document.querySelector('section');
+                  if (section) {
+                    section.style.padding = '50px';
+                    section.style.margin = '0';
+                    section.style.backgroundColor = '#000';
+                  }
+                `);
+                boostCalcWindow.webContents.executeJavaScript(`
+                  const elementsToHide = [
+                    document.querySelector('.navbar')
+                  ];
+                  elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                `);
+              });
+              // boostCalcWindow.webContents.openDevTools();
+
+              boostCalcWindow.on('closed', () => {
+                boostCalcWindow = null;
+              });
+            }
+          }
+        },
+
         // Wiki
         {
           label: 'Wiki',
@@ -795,6 +850,15 @@ function buildMenu(username) {
     {
       label: 'Help',
       submenu: [
+        {
+          label: 'Guide',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL(guideUrl);
+            }
+          }
+        },
         {
           label: 'FAQ',
           click: () => {
@@ -923,11 +987,11 @@ app.whenReady().then(() => {
                 if (onclickValue) {
                   console.log(onclickValue);
                   // Extract the URL from the onclick string
-                  const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/);
+                  const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/); // This extracts the href that launches the game
                   if (match) {
                     const extractedUrl = match[1];
                     console.log('Extracted URL:', extractedUrl);
-                    mainWindow.loadURL(extractedUrl);
+                    mainWindow.loadURL(extractedUrl); // Launch the game automatically if the href was found.
 
                   } else {
                     console.log('No URL matched in onclick value.');
