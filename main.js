@@ -7,18 +7,61 @@ require('electron-reload')(__dirname, {
 
 // Windows
 let mainWindow;
-let bossMapWindow = null;
 let wikiWindow = null;
 let faqWindow = null;
 let supportWindow = null;
+let bossMapWindow = null;
+let marketplaceWindow = null;
+let statsWindow = null;
+let wardrobeWindow = null;
+let damageTableWidow = null;
+let statisticsWindow = null;
 
 // URLS
 const url = 'https://fairview.deadfrontier.com';
 const lastUserUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo';
-const profilerUrl = 'https://www.dfprofiler.com/bossmap';
 const wikiLink = 'https://deadfrontier.fandom.com/wiki/Dead_Frontier_Wiki';
 const faqLink = 'https://support.deadfrontier.com/kb';
 const supportLink = 'https://support.deadfrontier.com/discussion/new';
+
+// DFprofiler URLs
+const profilerBossUrl = 'https://www.dfprofiler.com/bossmap';
+const profilerMarketplaceUrl = 'https://www.dfprofiler.com/marketplace';
+const profilerStatsUrl = 'https://www.dfprofiler.com/statcalculator';
+const profilerWardrobeUrl = 'https://www.dfprofiler.com/wardrobe';
+const profilerDamageTableUrl = 'https://www.dfprofiler.com/damage';
+const profilerStatisticsUrl = 'https://www.dfprofiler.com/statistics';
+
+
+// Outpost URLs
+const homeUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php';
+const inventoryUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=25';
+const bankUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=15';
+const craftingUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=59';
+const creditShopUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=28';
+const marketplaceUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=35';
+const storageUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=50';
+const yardUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=24';
+const clanUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=56';
+const teleportUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=61';
+const gamblingUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=49';
+const forumUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=forum';
+const recordsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=22';
+
+// Account URLs
+const messagesUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=pm';
+const challengesUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=62';
+const masteriesUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=81';
+const summaryUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=summary';
+const statsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=statPanel';
+const postsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=showPosts';
+const collectionUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=82';
+const accountSettingsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=account';
+const TFAUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=85';
+const profileSettingsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=forumProfile';
+const messageSettingsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=pmprefs';
+const friendsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=editBuddies';
+
 
 // Cookies
 const lastUserCookie = 'lastLoginUser';
@@ -29,7 +72,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 900,
-    icon: path.join(__dirname, 'assets', 'implant.ico'),
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       nodeIntegration: true,
     },
@@ -75,6 +118,21 @@ function createWindow() {
     if (faqWindow && !faqWindow.isDestroyed()) {
       faqWindow.close();
     }
+    if (marketplaceWindow && !marketplaceWindow.isDestroyed()) {
+      marketplaceWindow.close();
+    }
+    if (statsWindow && !statsWindow.isDestroyed()) {
+      statsWindow.close();
+    }
+    if (wardrobeWindow && !wardrobeWindow.isDestroyed()) {
+      wardrobeWindow.close();
+    }
+    if (damageTableWidow && !damageTableWidow.isDestroyed()) {
+      damageTableWidow.close();
+    }
+    if (statisticsWindow && !statisticsWindow.isDestroyed()) {
+      statisticsWindow.close();
+    }
     mainWindow = null;
   });
 
@@ -84,7 +142,7 @@ function createWindow() {
       show: true,
       width: 800,
       height: 600,
-      icon: path.join(__dirname, 'assets', 'implant.ico'),
+      icon: path.join(__dirname, 'assets', 'icon.ico'),
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: false,
@@ -114,13 +172,26 @@ function buildMenu(username) {
     {
       label: 'Outpost',
       submenu: [
+        // Home
+        {
+          label: 'Home',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL(homeUrl);
+            }
+          }
+        },
+
+        { type: 'separator' },
+
         // Inventory
         {
           label: 'Inventory && Equipment',
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=25');
+              mainWindow.loadURL(inventoryUrl);
             }
           }
         },
@@ -133,7 +204,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=15');
+              mainWindow.loadURL(bankUrl);
             }
           }
         },
@@ -144,7 +215,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=59');
+              mainWindow.loadURL(craftingUrl);
             }
           }
         },
@@ -155,7 +226,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=28');
+              mainWindow.loadURL(creditShopUrl);
             }
           }
         },
@@ -166,7 +237,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=35');
+              mainWindow.loadURL(marketplaceUrl);
             }
           }
         },
@@ -177,7 +248,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=50');
+              mainWindow.loadURL(storageUrl);
             }
           }
         },
@@ -188,7 +259,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=24');
+              mainWindow.loadURL(yardUrl);
             }
           }
         },
@@ -201,7 +272,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=56');
+              mainWindow.loadURL(clanUrl);
             }
           }
         },
@@ -212,7 +283,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=61');
+              mainWindow.loadURL(teleportUrl);
             }
           }
         },
@@ -223,7 +294,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=49');
+              mainWindow.loadURL(gamblingUrl);
             }
           }
         },
@@ -234,7 +305,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=forum');
+              mainWindow.loadURL(forumUrl);
             }
           }
         },
@@ -245,7 +316,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=22');
+              mainWindow.loadURL(recordsUrl);
             }
           }
         },
@@ -262,7 +333,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=pm');
+              mainWindow.loadURL(messagesUrl);
             }
           }
         },
@@ -273,7 +344,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=62');
+              mainWindow.loadURL(challengesUrl);
             }
           }
         },
@@ -284,7 +355,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=81');
+              mainWindow.loadURL(masteriesUrl);
             }
           }
         },
@@ -297,7 +368,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=summary');
+              mainWindow.loadURL(summaryUrl);
             }
           }
         },
@@ -308,7 +379,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=statPanel');
+              mainWindow.loadURL(statsUrl);
             }
           }
         },
@@ -319,7 +390,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=showPosts');
+              mainWindow.loadURL(postsUrl);
             }
           }
         },
@@ -330,7 +401,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=82');
+              mainWindow.loadURL(collectionUrl);
             }
           }
         },
@@ -347,7 +418,7 @@ function buildMenu(username) {
               enabled: !!username,
               click: () => {
                 if (username && mainWindow) {
-                  mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=account');
+                  mainWindow.loadURL(accountSettingsUrl);
                 }
               }
             },
@@ -357,7 +428,7 @@ function buildMenu(username) {
               enabled: !!username,
               click: () => {
                 if (username && mainWindow) {
-                  mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=85');
+                  mainWindow.loadURL(TFAUrl);
                 }
               }
             }
@@ -371,7 +442,18 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=forumProfile');
+              mainWindow.loadURL(profileSettingsUrl);
+            }
+          }
+        },
+
+        // Message Options
+        {
+          label: 'Message Settings',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL(messageSettingsUrl);
             }
           }
         },
@@ -382,7 +464,7 @@ function buildMenu(username) {
           enabled: !!username,
           click: () => {
             if (username && mainWindow) {
-              mainWindow.loadURL('https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=profile;sa=editBuddies');
+              mainWindow.loadURL(friendsUrl);
             }
           }
         },
@@ -402,69 +484,282 @@ function buildMenu(username) {
     {
       label: 'Tools',
       submenu: [
-        // Boss Map
         {
-          label: 'Boss Map',
-          click: () => {
-            // If window exists and focus it
-            if (bossMapWindow && !bossMapWindow.isDestroyed()) {
-              bossMapWindow.focus();
-            } else {
-              // Create new window
-              bossMapWindow = new BrowserWindow({
-                width: 800,
-                height: 700,
-                icon: path.join(__dirname, 'assets', 'implant.ico'),
-                title: 'Boss Map',
-                autoHideMenuBar: true,
-                webPreferences: {
-                  nodeIntegration: false
+          label: 'DFProfiler',
+          submenu: [
+            // Boss Map
+            {
+              label: 'Boss Map',
+              click: () => {
+                if (bossMapWindow && !bossMapWindow.isDestroyed()) {
+                  bossMapWindow.focus();
+                } else {
+                  bossMapWindow = new BrowserWindow({
+                    width: 800,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'Boss Map',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
+
+                  bossMapWindow.loadURL(profilerBossUrl); // Ensure profilerBossUrl is defined elsewhere
+
+                  bossMapWindow.webContents.on('did-finish-load', () => {
+                    bossMapWindow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    bossMapWindow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                        document.getElementById('outposts'),
+                        document.getElementById('old_bosses'),
+                        document.getElementById('gps-box')
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
+
+                  bossMapWindow.on('closed', () => {
+                    bossMapWindow = null;
+                  });
                 }
-              });
+              }
+            },
 
-              bossMapWindow.loadURL(profilerUrl);
+            // Profiler Marketplace
+            {
+              label: 'Marketplace',
+              click: () => {
+                if (marketplaceWindow && !marketplaceWindow.isDestroyed()) {
+                  marketplaceWindow.focus();
+                } else {
+                  marketplaceWindow = new BrowserWindow({
+                    width: 1200,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'DFprofiler Marketplace',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
 
-              // When the page finishes loading
-              bossMapWindow.webContents.on('did-finish-load', () => {
-                bossMapWindow.webContents.insertCSS(`
-                  ::-webkit-scrollbar {
-                    width: 0px;
-                    background: transparent;
-                  }
-                `);
-                bossMapWindow.webContents.executeJavaScript(`
-                  // Remove background image from body
-                  document.body.style.backgroundImage = 'none';
-                  document.body.style.backgroundColor = '#000000'; // Optional: set a background color
-                  const navbar = document.querySelector('.navbar');
-                  const title = document.querySelector('.page-title');
-                  const outposts = document.getElementById('outposts');
-                  const old_bosses = document.getElementById('old_bosses');
-                  const gps = document.getElementById('gps-box');
-                  if (navbar) {
-                    navbar.style.display = 'none';
-                  }
-                  if (outposts) {
-                    outposts.style.display = 'none';
-                  }
-                  if (title) {
-                    title.style.display = 'none';
-                  }
-                  if (old_bosses) {
-                    old_bosses.style.display = 'none';
-                  }
-                  if (gps) {
-                    gps.style.display = 'none';
-                  }
-                `);
-              });
+                  marketplaceWindow.loadURL(profilerMarketplaceUrl);
 
+                  marketplaceWindow.webContents.on('did-finish-load', () => {
+                    marketplaceWindow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    marketplaceWindow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
 
-              bossMapWindow.on('closed', () => {
-                bossMapWindow = null;
-              });
-            }
-          }
+                  marketplaceWindow.on('closed', () => {
+                    marketplaceWindow = null;
+                  });
+                }
+              }
+            },
+
+            // Stats Calculator
+            {
+              label: 'Stats Calculator',
+              click: () => {
+                if (statsWindow && !statsWindow.isDestroyed()) {
+                  statsWindow.focus();
+                } else {
+                  statsWindow = new BrowserWindow({
+                    width: 800,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'DFprofiler Stats Calculator',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
+
+                  statsWindow.loadURL(profilerStatsUrl);
+
+                  statsWindow.webContents.on('did-finish-load', () => {
+                    statsWindow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    statsWindow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
+
+                  statsWindow.on('closed', () => {
+                    statsWindow = null;
+                  });
+                }
+              }
+            },
+
+            // Wardrobe
+            {
+              label: 'Wardrobe',
+              click: () => {
+                if (wardrobeWindow && !wardrobeWindow.isDestroyed()) {
+                  wardrobeWindow.focus();
+                } else {
+                  wardrobeWindow = new BrowserWindow({
+                    width: 1200,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'DFprofiler Wardrobe',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
+
+                  wardrobeWindow.loadURL(profilerWardrobeUrl);
+
+                  wardrobeWindow.webContents.on('did-finish-load', () => {
+                    wardrobeWindow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    wardrobeWindow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
+
+                  wardrobeWindow.on('closed', () => {
+                    wardrobeWindow = null;
+                  });
+                }
+              }
+            },
+
+            // Damage Table
+            {
+              label: 'Damage Table',
+              click: () => {
+                if (damageTableWidow && !damageTableWidow.isDestroyed()) {
+                  damageTableWidow.focus();
+                } else {
+                  damageTableWidow = new BrowserWindow({
+                    width: 1200,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'DFprofiler Damage Table',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
+
+                  damageTableWidow.loadURL(profilerDamageTableUrl);
+
+                  damageTableWidow.webContents.on('did-finish-load', () => {
+                    damageTableWidow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    damageTableWidow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
+
+                  damageTableWidow.on('closed', () => {
+                    damageTableWidow = null;
+                  });
+                }
+              }
+            },
+
+            // Statistics
+            {
+              label: 'Statistics',
+              click: () => {
+                if (statisticsWindow && !statisticsWindow.isDestroyed()) {
+                  statisticsWindow.focus();
+                } else {
+                  statisticsWindow = new BrowserWindow({
+                    width: 1200,
+                    height: 700,
+                    icon: path.join(__dirname, 'assets', 'icon.ico'),
+                    title: 'DFprofiler Statistics',
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                      nodeIntegration: false
+                    }
+                  });
+
+                  statisticsWindow.loadURL(profilerStatisticsUrl);
+
+                  statisticsWindow.webContents.on('did-finish-load', () => {
+                    statisticsWindow.webContents.insertCSS(`
+                      ::-webkit-scrollbar {
+                        width: 0px;
+                        background: transparent;
+                      }
+                    `);
+                    statisticsWindow.webContents.executeJavaScript(`
+                      document.body.style.backgroundImage = 'none';
+                      document.body.style.backgroundColor = '#000000';
+                      const elementsToHide = [
+                        document.querySelector('.navbar'),
+                        document.querySelector('.page-title'),
+                      ];
+                      elementsToHide.forEach(el => { if (el) el.style.display = 'none'; });
+                    `);
+                  });
+
+                  statisticsWindow.on('closed', () => {
+                    statisticsWindow = null;
+                  });
+                }
+              }
+            },
+          ]
         },
 
         // Wiki
@@ -479,7 +774,7 @@ function buildMenu(username) {
               wikiWindow = new BrowserWindow({
                 width: 1000,
                 height: 700,
-                icon: path.join(__dirname, 'assets', 'implant.ico'),
+                icon: path.join(__dirname, 'assets', 'icon.ico'),
                 title: 'Wiki',
                 autoHideMenuBar: true,
                 webPreferences: {
