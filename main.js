@@ -1,9 +1,17 @@
-const { app, BrowserWindow, Menu, shell, session } = require('electron');
+const { app, BrowserWindow, Menu, shell, session, nativeTheme } = require('electron');
 const path = require('path');
+const Store = require('electron-store').default;
+
 
 require('electron-reload')(__dirname, {
   electron: require(`${__dirname}/node_modules/electron`)
 });
+
+
+const store = new Store();
+
+// Current logged in user's username
+let username = null;
 
 // Windows
 let mainWindow;
@@ -17,6 +25,9 @@ let wardrobeWindow = null;
 let damageTableWidow = null;
 let statisticsWindow = null;
 let boostCalcWindow = null;
+
+// Stored Theme
+let currentTheme = store.get('theme') || 'system';
 
 // URLS
 const url = 'https://fairview.deadfrontier.com';
@@ -74,9 +85,11 @@ const seshCookie = 'PHPSESSID';
 
 // Main window
 function createWindow() {
+  const fullscreenOnStartup = store.get('fullscreenOnStartup', false);
   mainWindow = new BrowserWindow({
     width: 1100,
     height: 900,
+    show: false,
     icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       nodeIntegration: true,
@@ -89,6 +102,14 @@ function createWindow() {
           display: none;
       }
     `);
+  });
+
+  // Show and maximize after ready-to-show
+  mainWindow.once('ready-to-show', () => {
+    if (fullscreenOnStartup) {
+      mainWindow.maximize();
+    }
+    mainWindow.show();
   });
 
   mainWindow.loadURL(url);
@@ -154,6 +175,7 @@ function createWindow() {
       autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: false,
+        partition: 'persist:dfSession'
       }
     });
 
@@ -168,8 +190,6 @@ function createWindow() {
 
     return { action: 'deny' };
   });
-
-
 }
 
 
@@ -847,6 +867,47 @@ function buildMenu(username) {
         },
       ]
     },
+
+    {
+      label: 'Options',
+      submenu: [
+        {
+          label: 'Theme',
+          submenu: [
+            {
+              label: 'Light',
+              type: 'radio',
+              checked: currentTheme === 'light',
+              click: () => setTheme('light')
+            },
+            {
+              label: 'Dark',
+              type: 'radio',
+              checked: currentTheme === 'dark',
+              click: () => setTheme('dark')
+            },
+            {
+              label: 'System Default',
+              type: 'radio',
+              checked: currentTheme === 'system',
+              click: () => setTheme('system')
+            }
+          ]
+        },
+        {
+          label: 'Start Maximized',
+          type: 'checkbox',
+          checked: store.get('fullscreenOnStartup', false),
+          click: (menuItem) => {
+            const enabled = menuItem.checked;
+            store.set('fullscreenOnStartup', enabled);
+            // Update checkmarks
+            updateMenu();
+          }
+        },
+      ]
+    },
+
     {
       label: 'Help',
       submenu: [
@@ -926,6 +987,22 @@ function buildMenu(username) {
   ]);
 };
 
+// Switch theme
+function setTheme(theme) {
+  currentTheme = theme;
+  store.set('theme', theme);
+  nativeTheme.themeSource = theme;
+
+  // Update checkmarks
+  updateMenu();
+}
+
+// Update the current theme selection in the menu
+function updateMenu() {
+  const menu = buildMenu(username);
+  Menu.setApplicationMenu(menu);
+}
+
 function logout() {
   if (!mainWindow) return;
 
@@ -955,6 +1032,8 @@ function logout() {
 app.whenReady().then(() => {
   createWindow();
   Menu.setApplicationMenu(buildMenu(null));
+  nativeTheme.themeSource = currentTheme;
+  updateMenu();
   // mainWindow.webContents.openDevTools();
 
 
@@ -969,7 +1048,7 @@ app.whenReady().then(() => {
           name: 'lastLoginUser'
         }).then(cookies => {
           if (cookies.length > 0) {
-            const username = cookies[0].value;
+            username = cookies[0].value;
             console.log('Username from cookie:', username);
 
             const menu = buildMenu(username);
@@ -1015,7 +1094,8 @@ app.whenReady().then(() => {
       }, 1000);
     } else {
       console.log('Did not match target URL, skipping cookie check.');
-      const menu = buildMenu(null);
+      username = null;
+      const menu = buildMenu(username);
       Menu.setApplicationMenu(menu);
     }
   });
