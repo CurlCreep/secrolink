@@ -63,6 +63,7 @@ const teleportUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php
 const gamblingUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=49';
 const forumUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=forum';
 const recordsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=22';
+const vendorUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?page=84';
 
 // Account URLs
 const messagesUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?action=pm';
@@ -197,6 +198,7 @@ function createWindow() {
 // Menu bar
 function buildMenu(username) {
   return Menu.buildFromTemplate([
+    // Outpost
     {
       label: 'Outpost',
       submenu: [
@@ -292,6 +294,17 @@ function buildMenu(username) {
           }
         },
 
+        // Vendor
+        {
+          label: 'Vendor',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL(vendorUrl);
+            }
+          }
+        },
+
         { type: 'separator' },
 
         // Clan HQ
@@ -350,6 +363,7 @@ function buildMenu(username) {
         },
       ]
     },
+    // Account
     {
       label: 'Account',
       submenu: [
@@ -509,6 +523,7 @@ function buildMenu(username) {
         { label: 'Logout', click: logout },
       ]
     },
+    // Tools
     {
       label: 'Tools',
       submenu: [
@@ -867,7 +882,7 @@ function buildMenu(username) {
         },
       ]
     },
-
+    // Options
     {
       label: 'Options',
       submenu: [
@@ -907,7 +922,7 @@ function buildMenu(username) {
         },
       ]
     },
-
+    // Help
     {
       label: 'Help',
       submenu: [
