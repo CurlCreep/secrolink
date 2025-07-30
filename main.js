@@ -102,7 +102,7 @@ const lastUserCookie = 'lastLoginUser';
 const seshCookie = 'PHPSESSID';
 
 // Outpost attacks time table in UTC
-const OPTriggerTimes = [
+const OASummerTimes = [
   { hour: 5, minute: 0 },
   { hour: 8, minute: 0 },
   { hour: 11, minute: 0 },
@@ -112,6 +112,18 @@ const OPTriggerTimes = [
   { hour: 23, minute: 0 },
   { hour: 2, minute: 0 },
 ];
+
+const OAWinterTimes = [
+  { hour: 6, minute: 0 },
+  { hour: 9, minute: 0 },
+  { hour: 12, minute: 0 },
+  { hour: 15, minute: 0 },
+  { hour: 18, minute: 0 },
+  { hour: 21, minute: 0 },
+  { hour: 0, minute: 0 },
+  { hour: 3, minute: 0 },
+];
+
 
 // Main window
 function createWindow() {
@@ -1169,7 +1181,7 @@ function showNotification() {
   }).show();
 }
 
-// Check every minute if now matches any trigger time (local time)
+// Check every minute if now matches any trigger time
 function startNotificationScheduler() {
   if (notificationIntervalId !== null) return; // Already running
 
@@ -1188,9 +1200,17 @@ function startNotificationScheduler() {
       now.getUTCHours(), now.getUTCMinutes()
     ));
 
+    // Date range for summer time
+    const currentYear = now.getUTCFullYear();
+    const summerStart = new Date(Date.UTC(currentYear, 2, 9)); // March 9
+    const summerEnd = new Date(Date.UTC(currentYear, 10, 2, 23, 59)); // November 2
+
+    const isSummer = nowUTC >= summerStart && nowUTC <= summerEnd;
+    const activeTimes = isSummer ? OASummerTimes : OAWinterTimes;
+
     let nextNotificationInMinutes = null;
 
-    OPTriggerTimes.forEach(({ hour, minute }) => {
+    activeTimes.forEach(({ hour, minute }) => {
       const triggerUTC = new Date(Date.UTC(
         now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minute
       ));
@@ -1214,11 +1234,10 @@ function startNotificationScheduler() {
     if (nextNotificationInMinutes !== null) {
       console.log(`Next notification in: ${nextNotificationInMinutes} minute(s)`);
     }
-
   }, 60 * 1000);
-
   notificationSchedulerStarted = true;
 }
+
 
 
 function stopNotificationScheduler() {
