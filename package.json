@@ -1,5 +1,6 @@
 {
   "name": "df-client",
+  "productName": "Dead Frontier",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",

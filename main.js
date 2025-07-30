@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, session, nativeTheme } = require('electron');
+const { app, BrowserWindow, Menu, shell, session, nativeTheme, Notification } = require('electron');
 const path = require('path');
 const Store = require('electron-store').default;
 
@@ -26,11 +26,23 @@ let damageTableWidow = null;
 let statisticsWindow = null;
 let boostCalcWindow = null;
 
+// Keep alive interval running variable
+let keepAliveInterval = null;
+
+
 // Global variable to check if the player is inside a barricaded outpost
 let barricadedOutpost = false;
 
 // Stored Theme
 let currentTheme = store.get('theme') || 'system';
+
+// Launch game automatically
+let automaticGameLaunch = store.get('automaticGameLaunch', false);
+
+// Notification schedule running?
+let notificationSchedulerStarted = false;
+let oaNotification = store.get('oaNotification', false); // Notifications disabled by default
+let notificationIntervalId = null; // Scheduler ID
 
 // URLS
 const url = 'https://fairview.deadfrontier.com';
@@ -86,6 +98,18 @@ const friendsUrl = 'https://fairview.deadfrontier.com/onlinezombiemmo/index.php?
 // Cookies
 const lastUserCookie = 'lastLoginUser';
 const seshCookie = 'PHPSESSID';
+
+// Outpost attacks time table in UTC
+const OPTriggerTimes = [
+  { hour: 5, minute: 0 },
+  { hour: 8, minute: 0 },
+  { hour: 11, minute: 0 },
+  { hour: 14, minute: 0 },
+  { hour: 17, minute: 0 },
+  { hour: 20, minute: 0 },
+  { hour: 23, minute: 0 },
+  { hour: 2, minute: 0 },
+];
 
 // Main window
 function createWindow() {
@@ -515,7 +539,7 @@ function buildMenu() {
 
         { type: 'separator' },
         {
-          label: 'Switch Accounts', enabled: false,
+          label: 'Switch Accounts', enabled: false, visible: false,
           submenu: [
             { label: 'No Added Acccounts', enabled: false },
             { type: 'separator' },
@@ -888,6 +912,7 @@ function buildMenu() {
     {
       label: 'Options',
       submenu: [
+        // Theme picker
         {
           label: 'Theme',
           submenu: [
@@ -911,6 +936,7 @@ function buildMenu() {
             }
           ]
         },
+        // Start the window maximized
         {
           label: 'Start Maximized',
           type: 'checkbox',
@@ -918,7 +944,39 @@ function buildMenu() {
           click: (menuItem) => {
             const enabled = menuItem.checked;
             store.set('fullscreenOnStartup', enabled);
-            // Update checkmarks
+            // Update menu
+            updateMenu();
+          }
+        },
+        // Automatic game launch
+        {
+          label: 'Launch game automatically',
+          type: 'checkbox',
+          checked: automaticGameLaunch, // use the global variable
+          click: (menuItem) => {
+            automaticGameLaunch = menuItem.checked; // update the global variable
+            store.set('automaticGameLaunch', automaticGameLaunch); // persist the value
+            // Update menu
+            updateMenu();
+          }
+        },
+        // Enable outpost attack notification
+        {
+          label: 'Outpost Attack Notifications',
+          type: 'checkbox',
+          checked: oaNotification, // use the global variable
+          click: (menuItem) => {
+            oaNotification = menuItem.checked;
+            store.set('oaNotification', oaNotification);
+
+            if (oaNotification) {
+              if (!notificationSchedulerStarted) {
+                startNotificationScheduler();
+              }
+            } else {
+              stopNotificationScheduler();
+            }
+
             updateMenu();
           }
         },
@@ -1062,7 +1120,7 @@ function setTheme(theme) {
 
 // Update the current theme selection in the menu
 function updateMenu() {
-  const menu = buildMenu(username);
+  const menu = buildMenu();
   Menu.setApplicationMenu(menu);
 }
 
@@ -1088,12 +1146,85 @@ function logout() {
     });
 }
 
+// Outpost attack notifications
+function showNotification() {
+  new Notification({
+    title: 'Outpost is under attack!',
+    body: 'Next outpost attack is in 3 hours.',
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
+  }).show();
+}
+
+// Check every minute if now matches any trigger time (local time)
+function startNotificationScheduler() {
+  if (notificationIntervalId !== null) return; // Already running
+
+  console.log('Outpost Notification Scheduler Started');
+
+  notificationIntervalId = setInterval(() => {
+    const now = new Date();
+    const localTime = now.toLocaleTimeString();
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    console.log(`Current local time: ${localTime}`);
+    console.log(`Current timezone: ${timeZone}`);
+
+    const nowUTC = new Date(Date.UTC(
+      now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+      now.getUTCHours(), now.getUTCMinutes()
+    ));
+
+    let nextNotificationInMinutes = null;
+
+    OPTriggerTimes.forEach(({ hour, minute }) => {
+      const triggerUTC = new Date(Date.UTC(
+        now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour, minute
+      ));
+
+      if (triggerUTC < nowUTC) {
+        triggerUTC.setUTCDate(triggerUTC.getUTCDate() + 1);
+      }
+
+      const diffMs = triggerUTC - nowUTC;
+      const diffMins = Math.floor(diffMs / (60 * 1000));
+
+      if (nextNotificationInMinutes === null || diffMins < nextNotificationInMinutes) {
+        nextNotificationInMinutes = diffMins;
+      }
+
+      if (nowUTC.getUTCHours() === hour && nowUTC.getUTCMinutes() === minute) {
+        showNotification();
+      }
+    });
+
+    if (nextNotificationInMinutes !== null) {
+      console.log(`Next notification in: ${nextNotificationInMinutes} minute(s)`);
+    }
+
+  }, 60 * 1000);
+
+  notificationSchedulerStarted = true;
+}
+
+
+function stopNotificationScheduler() {
+  if (notificationIntervalId !== null) {
+    clearInterval(notificationIntervalId);
+    notificationIntervalId = null;
+    notificationSchedulerStarted = false;
+    console.log('Outpost Notification Scheduler Stopped');
+  }
+}
+
+
+
 
 
 
 
 app.whenReady().then(() => {
   createWindow();
+
   Menu.setApplicationMenu(buildMenu(null));
   nativeTheme.themeSource = currentTheme;
   updateMenu();
@@ -1116,6 +1247,37 @@ app.whenReady().then(() => {
             const menu = buildMenu(username);
             Menu.setApplicationMenu(menu);
 
+            // Prevent session expiry
+            if (keepAliveInterval) clearInterval(keepAliveInterval); // Clear existing interval if any
+            keepAliveInterval = setInterval(() => {
+              const currentUrl = mainWindow.webContents.getURL();
+
+              if (currentUrl.includes('onlinezombiemmo')) {
+                mainWindow.webContents.executeJavaScript(`
+                  fetch(window.location.href, { method: 'HEAD', cache: 'no-store' })
+                    .then(() => console.log('Keep-alive ping sent.'))
+                    .catch(() => {});
+                `);
+              }
+            }, 5 * 60 * 1000); // Send request every 5 minutes
+
+            if (oaNotification && !notificationSchedulerStarted) {
+              startNotificationScheduler();
+              notificationSchedulerStarted = true;
+            } // Outpost attack notifications
+
+            // If the player is on the revive screen, then revive him automatically
+            mainWindow.webContents.executeJavaScript(`
+              const buttons = document.querySelectorAll('.opElem');
+              for (const btn of buttons) {
+                if (btn.textContent.trim().toLowerCase() === 'revive') {
+                  btn.click();
+                  break;
+                }
+              }
+            `);
+
+            // Check if the player is in a barricaded outpost
             mainWindow.webContents.executeJavaScript(`
               (function() {
                 const logo = document.getElementById('pageLogo');
@@ -1135,7 +1297,8 @@ app.whenReady().then(() => {
               console.error('Error checking #pageLogo span:', err);
             });
 
-            if (currentUrl.includes('page=21')) {
+            let automaticGameLaunch = store.get('automaticGameLaunch', false);
+            if (automaticGameLaunch && currentUrl.includes('page=21')) {
               console.log('Leaving outpost');
 
               mainWindow.webContents.executeJavaScript(`
@@ -1151,7 +1314,7 @@ app.whenReady().then(() => {
                   if (match) {
                     const extractedUrl = match[1];
                     console.log('Extracted URL:', extractedUrl);
-                    // mainWindow.loadURL(extractedUrl); // Launch the game automatically if the href was found.
+                    mainWindow.loadURL(extractedUrl); // Launch the game automatically
 
                   } else {
                     console.log('No URL matched in onclick value.');
