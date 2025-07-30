@@ -26,6 +26,9 @@ let damageTableWidow = null;
 let statisticsWindow = null;
 let boostCalcWindow = null;
 
+// Global variable to check if the player is inside a barricaded outpost
+let barricadedOutpost = false;
+
 // Stored Theme
 let currentTheme = store.get('theme') || 'system';
 
@@ -196,7 +199,7 @@ function createWindow() {
 
 
 // Menu bar
-function buildMenu(username) {
+function buildMenu() {
   return Menu.buildFromTemplate([
     // Outpost
     {
@@ -205,9 +208,8 @@ function buildMenu(username) {
         // Home
         {
           label: 'Home',
-          enabled: !!username,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(homeUrl);
             }
           }
@@ -286,7 +288,7 @@ function buildMenu(username) {
         // The Yard
         {
           label: 'The Yard',
-          enabled: !!username,
+          enabled: !!username && !barricadedOutpost,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(yardUrl);
@@ -297,7 +299,7 @@ function buildMenu(username) {
         // Vendor
         {
           label: 'Vendor',
-          enabled: !!username,
+          enabled: !!username && !barricadedOutpost,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(vendorUrl);
@@ -321,7 +323,7 @@ function buildMenu(username) {
         // Fast Travel
         {
           label: 'Fast Travel',
-          enabled: !!username,
+          enabled: !!username && !barricadedOutpost,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(teleportUrl);
@@ -332,7 +334,7 @@ function buildMenu(username) {
         // Gambling Den
         {
           label: 'Gambling Den',
-          enabled: !!username,
+          enabled: !!username && !barricadedOutpost,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(gamblingUrl);
@@ -368,6 +370,17 @@ function buildMenu(username) {
       label: 'Account',
       submenu: [
         username ? { label: `Signed in as: ${username}`, enabled: false } : { label: 'Not signed in', enabled: false },
+
+        // Buddies
+        {
+          label: 'Friends',
+          enabled: !!username,
+          click: () => {
+            if (username && mainWindow) {
+              mainWindow.loadURL(friendsUrl);
+            }
+          }
+        },
 
         // Messages
         {
@@ -496,17 +509,6 @@ function buildMenu(username) {
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(messageSettingsUrl);
-            }
-          }
-        },
-
-        // Buddies
-        {
-          label: 'Friends',
-          enabled: !!username,
-          click: () => {
-            if (username && mainWindow) {
-              mainWindow.loadURL(friendsUrl);
             }
           }
         },
@@ -922,6 +924,52 @@ function buildMenu(username) {
         },
       ]
     },
+    // Window
+    {
+      label: 'Window',
+      submenu: [
+        // Refresh page
+        {
+          label: 'Refresh',
+          accelerator: 'F5',
+          click: () => {
+            if (mainWindow) {
+              mainWindow.reload();
+            }
+          }
+        },
+        // Zoom-in
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+=',
+          click: () => {
+            const currentZoom = mainWindow.webContents.getZoomFactor();
+            mainWindow.webContents.setZoomFactor(currentZoom + 0.1);
+          }
+        },
+        // Zoom-out
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => {
+            const currentZoom = mainWindow.webContents.getZoomFactor();
+            mainWindow.webContents.setZoomFactor(currentZoom - 0.1);
+          }
+        },
+        // Reset Zoom
+        {
+          label: 'Reset Zoom',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => {
+            mainWindow.webContents.setZoomFactor(1.0);
+          }
+        },
+        // Minimize Window
+        { role: 'minimize' },
+        // Close Window
+        { role: 'close' }
+      ]
+    },
     // Help
     {
       label: 'Help',
@@ -1065,9 +1113,27 @@ app.whenReady().then(() => {
           if (cookies.length > 0) {
             username = cookies[0].value;
             console.log('Username from cookie:', username);
-
             const menu = buildMenu(username);
             Menu.setApplicationMenu(menu);
+
+            mainWindow.webContents.executeJavaScript(`
+              (function() {
+                const logo = document.getElementById('pageLogo');
+                const span = logo ? logo.querySelector('span') : null;
+                return span ? span.textContent.trim() : null;
+              })();
+            `).then(spanText => {
+              if (spanText && !spanText.includes("OUTPOST IS UNDER ATTACK!")) {
+                console.log(spanText);
+                barricadedOutpost = true;
+                const menu = buildMenu();
+                Menu.setApplicationMenu(menu);
+              } else {
+                console.log('#pageLogo does not contain a <span> element');
+              }
+            }).catch(err => {
+              console.error('Error checking #pageLogo span:', err);
+            });
 
             if (currentUrl.includes('page=21')) {
               console.log('Leaving outpost');
@@ -1085,7 +1151,7 @@ app.whenReady().then(() => {
                   if (match) {
                     const extractedUrl = match[1];
                     console.log('Extracted URL:', extractedUrl);
-                    mainWindow.loadURL(extractedUrl); // Launch the game automatically if the href was found.
+                    // mainWindow.loadURL(extractedUrl); // Launch the game automatically if the href was found.
 
                   } else {
                     console.log('No URL matched in onclick value.');
