@@ -25,7 +25,7 @@
 
 ### Windows
 
-1. Download the latest `.exe` installer from the [Releases](https://github.com/CurlCreep/secrolink/releases/download/v1.0.0/Secrolink.Setup.1.0.0.exe) page.
+1. Download the [installer](https://github.com/CurlCreep/secrolink/releases/download/v1.0.0/Secrolink.Setup.1.0.0.exe) from the releases page.
 2. Run the installer.
 3. Follow the setup steps and select your desired installation location.
 4. Launch Secrolink.exe from the desktop.
