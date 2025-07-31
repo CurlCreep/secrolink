@@ -1,5 +1,5 @@
 {
-  "name": "df-client",
+  "name": "secrolink",
   "productName": "Secrolink",
   "version": "1.0.0",
   "description": "Unofficial Dead Frontier 3D Desktop Client",
@@ -9,6 +9,20 @@
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.curlcreep.secrolink",
+    "productName": "Secrolink",
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "directories": {
+      "buildResources": "build"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "keywords": [],
   "author": "",

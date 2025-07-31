@@ -3,9 +3,16 @@ const path = require('path');
 const Store = require('electron-store').default;
 
 
-require('electron-reload')(__dirname, {
-  electron: require(`${__dirname}/node_modules/electron`)
-});
+if (process.env.NODE_ENV === 'development') {
+  try {
+    require('electron-reload')(__dirname, {
+      electron: require(`${__dirname}/node_modules/electron`)
+    });
+  } catch (e) {
+    console.log('electron-reload not found, skipping live reload.');
+  }
+}
+
 
 
 const store = new Store();
