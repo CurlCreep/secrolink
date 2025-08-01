@@ -33,11 +33,6 @@ let damageTableWidow = null;
 let statisticsWindow = null;
 let boostCalcWindow = null;
 
-// Keep alive interval running variable
-let keepAliveInterval = null;
-// Prevent session expiry variable
-let keepSessionAlive = store.get('keepSessionAlive', false);
-
 // Stored Theme
 let currentTheme = store.get('theme') || 'system';
 
@@ -997,18 +992,6 @@ function buildMenu() {
             updateMenu();
           }
         },
-        // Prevent Session Expiry
-        {
-          label: 'Prevent Session Expiry',
-          type: 'checkbox',
-          checked: keepSessionAlive, // use the global variable
-          click: (menuItem) => {
-            keepSessionAlive = menuItem.checked;
-            store.set('keepSessionAlive', keepSessionAlive);
-            // Update menu
-            updateMenu();
-          }
-        },
       ]
     },
     // Window
@@ -1282,24 +1265,6 @@ app.whenReady().then(() => {
             console.log('Username from cookie:', username);
             const menu = buildMenu(username);
             Menu.setApplicationMenu(menu);
-
-            // Prevent session expiry
-            if (keepAliveInterval) clearInterval(keepAliveInterval); // Clear existing interval if any
-            
-            if (keepSessionAlive) {
-              keepAliveInterval = setInterval(() => {
-                const currentUrl = mainWindow.webContents.getURL();
-
-                if (currentUrl.includes('onlinezombiemmo')) {
-                  mainWindow.webContents.executeJavaScript(`
-                    fetch(window.location.href, { method: 'HEAD', cache: 'no-store' })
-                      .then(() => console.log('Keep-alive ping sent.'))
-                      .catch(() => {});
-                  `);
-                }
-              }, 5 * 60 * 1000); // Send request every 5 minutes
-            }
-
 
             if (oaNotification && !notificationSchedulerStarted) {
               startNotificationScheduler();
