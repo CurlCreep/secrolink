@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 
-
+app.setAppUserModelId('com.curlcreep.secrolink');
 const store = new Store();
 
 // Current logged in user's username
@@ -37,10 +37,6 @@ let boostCalcWindow = null;
 let keepAliveInterval = null;
 // Prevent session expiry variable
 let keepSessionAlive = store.get('keepSessionAlive', false);
-
-
-// Global variable to check if the player is inside a barricaded outpost
-let barricadedOutpost = false;
 
 // Stored Theme
 let currentTheme = store.get('theme') || 'system';
@@ -333,7 +329,7 @@ function buildMenu() {
         // The Yard
         {
           label: 'The Yard',
-          enabled: !!username && !barricadedOutpost,
+          enabled: !!username,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(yardUrl);
@@ -344,7 +340,7 @@ function buildMenu() {
         // Vendor
         {
           label: 'Vendor',
-          enabled: !!username && !barricadedOutpost,
+          enabled: !!username,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(vendorUrl);
@@ -368,7 +364,7 @@ function buildMenu() {
         // Fast Travel
         {
           label: 'Fast Travel',
-          enabled: !!username && !barricadedOutpost,
+          enabled: !!username,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(teleportUrl);
@@ -379,7 +375,7 @@ function buildMenu() {
         // Gambling Den
         {
           label: 'Gambling Den',
-          enabled: !!username && !barricadedOutpost,
+          enabled: !!username,
           click: () => {
             if (username && mainWindow) {
               mainWindow.loadURL(gamblingUrl);
@@ -1320,26 +1316,6 @@ app.whenReady().then(() => {
                 }
               }
             `);
-
-            // Check if the player is in a barricaded outpost
-            mainWindow.webContents.executeJavaScript(`
-              (function() {
-                const logo = document.getElementById('pageLogo');
-                const span = logo ? logo.querySelector('span') : null;
-                return span ? span.textContent.trim() : null;
-              })();
-            `).then(spanText => {
-              if (spanText && !spanText.includes("OUTPOST IS UNDER ATTACK!")) {
-                console.log(spanText);
-                barricadedOutpost = true;
-                const menu = buildMenu();
-                Menu.setApplicationMenu(menu);
-              } else {
-                console.log('#pageLogo does not contain a <span> element');
-              }
-            }).catch(err => {
-              console.error('Error checking #pageLogo span:', err);
-            });
 
             let automaticGameLaunch = store.get('automaticGameLaunch', false);
             if (automaticGameLaunch && currentUrl.includes('page=21')) {
