@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, session, nativeTheme, Notification } = require('electron');
+const { app, BrowserWindow, Menu, shell, session, nativeTheme, Notification, Tray } = require('electron');
 const path = require('path');
 const Store = require('electron-store').default;
 
@@ -43,6 +43,10 @@ let automaticGameLaunch = store.get('automaticGameLaunch', false);
 let notificationSchedulerStarted = false;
 let oaNotification = store.get('oaNotification', false); // Notifications disabled by default
 let notificationIntervalId = null; // Scheduler ID
+
+// Option to minimize the app to trey when its closed
+let tray = null;
+let minimizeToTray = store.get('minimizeToTray', false);
 
 // URLS
 const url = 'https://fairview.deadfrontier.com';
@@ -237,6 +241,22 @@ function createWindow() {
 // Menu bar
 function buildMenu() {
   return Menu.buildFromTemplate([
+    {
+      label: '<',
+      click: () => {
+        if (mainWindow && mainWindow.webContents.canGoBack()) {
+          mainWindow.webContents.goBack();
+        }
+      }
+    },
+    {
+      label: '>',
+      click: () => {
+        if (mainWindow && mainWindow.webContents.canGoForward()) {
+          mainWindow.webContents.goForward();
+        }
+      }
+    },
     // Outpost
     {
       label: 'Outpost',
@@ -992,6 +1012,17 @@ function buildMenu() {
             updateMenu();
           }
         },
+        // Minimize to tray on close
+        {
+          label: 'Minimize App to Tray on Close',
+          type: 'checkbox',
+          checked: minimizeToTray,
+          click: (menuItem) => {
+            minimizeToTray = menuItem.checked;
+            store.set('minimizeToTray', minimizeToTray);
+            updateMenu();
+          }
+        },
       ]
     },
     // Window
@@ -1235,20 +1266,55 @@ function stopNotificationScheduler() {
   }
 }
 
+// This function creates the trey entry for the app
+function createTray() {
+  if (tray) return; // Already created
 
+  tray = new Tray(path.join(__dirname, 'assets', 'icon.ico'));
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Show App', click: () => {
+      mainWindow.show();
+      mainWindow.setSkipTaskbar(false);
+    }},
+    { label: 'Quit', click: () => {
+      tray.destroy();
+      app.quit();
+    }}
+  ]);
+  tray.setToolTip('Secrolink');
+  tray.setContextMenu(contextMenu);
 
+  tray.on('double-click', () => {
+    mainWindow.show();
+    mainWindow.setSkipTaskbar(false);
+  });
+}
 
-
+// Open the app again if the trey icon is clicked
+app.on('activate', () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.setSkipTaskbar(false);
+  }
+});
 
 
 app.whenReady().then(() => {
   createWindow();
+  createTray();
 
   Menu.setApplicationMenu(buildMenu(null));
   nativeTheme.themeSource = currentTheme;
   updateMenu();
   // mainWindow.webContents.openDevTools();
-
+  
+  // Minimize to trey if option is enabled
+  mainWindow.on('close', (e) => {
+    if (minimizeToTray) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+  });
 
   // Read username cookie
   mainWindow.webContents.on('did-finish-load', () => {
