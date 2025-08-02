@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, session, nativeTheme, Notification, Tray } = require('electron');
+const { app, BrowserWindow, Menu, shell, session, nativeTheme, Notification, Tray, ipcMain, dialog } = require('electron');
 const path = require('path');
 const Store = require('electron-store').default;
 
@@ -12,7 +12,6 @@ if (process.env.NODE_ENV === 'development') {
     console.log('electron-reload not found, skipping live reload.');
   }
 }
-
 
 app.setAppUserModelId('com.curlcreep.secrolink');
 const store = new Store();
@@ -137,6 +136,7 @@ function createWindow() {
     icon: path.join(__dirname, 'assets', 'icon.ico'),
     webPreferences: {
       nodeIntegration: true,
+      disableDialogs: true
     },
   });
 
