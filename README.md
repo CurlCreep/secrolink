@@ -14,7 +14,6 @@
 
 - Outpost Attack notifications.
 - DFprofiler, DF Buddy Boosts Calculator, and Wiki integration.
-- An option to prevent session expiry when idle.
 - An option to launch the game automatically when leaving the outpost.
 - Revive your character automatically.
 - Everything is accessible through the menu bar.
