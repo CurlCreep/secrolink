@@ -16,6 +16,7 @@
 - DFprofiler, DF Buddy Boosts Calculator, and Wiki integration.
 - An option to launch the game automatically when leaving the outpost.
 - Revive your character automatically.
+- Minimize game to trey to prevent getting logged out.
 - Everything is accessible through the menu bar.
 
 ---
