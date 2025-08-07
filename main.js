@@ -1316,84 +1316,89 @@ app.whenReady().then(() => {
     }
   });
 
-  // Read username cookie
+
+
   mainWindow.webContents.on('did-finish-load', () => {
-    const currentUrl = mainWindow.webContents.getURL();
-    console.log(currentUrl)
-    if (currentUrl.includes('onlinezombiemmo')) {
-      setTimeout(() => {
-        session.defaultSession.cookies.get({
-          url: currentUrl,
-          name: 'lastLoginUser'
-        }).then(cookies => {
-          if (cookies.length > 0) {
-            username = cookies[0].value;
-            console.log('Username from cookie:', username);
-            const menu = buildMenu(username);
-            Menu.setApplicationMenu(menu);
+    function checkCookieAndRun() {
+      const currentUrl = mainWindow.webContents.getURL();
+      if (!currentUrl.includes('onlinezombiemmo')) {
+        console.log('Stopped: URL does not contain "onlinezombiemmo".');
+        username = null;
+        const menu = buildMenu(username);
+        Menu.setApplicationMenu(menu);
+        return;
+      }
 
-            if (oaNotification && !notificationSchedulerStarted) {
-              startNotificationScheduler();
-              notificationSchedulerStarted = true;
-            } // Outpost attack notifications
+      session.defaultSession.cookies.get({
+        url: currentUrl,
+        name: 'lastLoginUser'
+      }).then(cookies => {
+        if (cookies.length > 0) {
+          username = cookies[0].value;
+          console.log('Username from cookie:', username);
+          const menu = buildMenu(username);
+          Menu.setApplicationMenu(menu);
 
-            // If the player is on the revive screen, then revive him automatically
-            mainWindow.webContents.executeJavaScript(`
-              const buttons = document.querySelectorAll('.opElem');
-              for (const btn of buttons) {
-                if (btn.textContent.trim().toLowerCase() === 'revive') {
-                  btn.click();
-                  break;
-                }
+          if (oaNotification && !notificationSchedulerStarted) {
+            startNotificationScheduler();
+            notificationSchedulerStarted = true;
+          }
+
+          // Auto-revive
+          mainWindow.webContents.executeJavaScript(`
+            const buttons = document.querySelectorAll('.opElem');
+            for (const btn of buttons) {
+              if (btn.textContent.trim().toLowerCase() === 'revive') {
+                btn.click();
+                break;
               }
-            `);
-
-            let automaticGameLaunch = store.get('automaticGameLaunch', false);
-            if (automaticGameLaunch && currentUrl.includes('page=21')) {
-              console.log('Leaving outpost');
-
-              mainWindow.webContents.executeJavaScript(`
-                (function() {
-                  const btn = document.querySelector('button[onclick]');
-                  return btn ? btn.getAttribute('onclick') : null;
-                })();
-              `).then(onclickValue => {
-                if (onclickValue) {
-                  console.log(onclickValue);
-                  // Extract the URL from the onclick string
-                  const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/); // This extracts the href that launches the game
-                  if (match) {
-                    const extractedUrl = match[1];
-                    console.log('Extracted URL:', extractedUrl);
-                    mainWindow.loadURL(extractedUrl); // Launch the game automatically
-
-                  } else {
-                    console.log('No URL matched in onclick value.');
-                  }
-                } else {
-                  console.log('Button or onclick not found.');
-                }
-              }).catch(err => {
-                console.error('Error while executing JS:', err);
-              });
             }
+          `);
+
+          // Auto game launch
+          let automaticGameLaunch = store.get('automaticGameLaunch', false);
+          if (automaticGameLaunch && currentUrl.includes('page=21')) {
+            console.log('Leaving outpost');
+
+            mainWindow.webContents.executeJavaScript(`
+              (function() {
+                const btn = document.querySelector('button[onclick]');
+                return btn ? btn.getAttribute('onclick') : null;
+              })();
+            `).then(onclickValue => {
+              if (onclickValue) {
+                console.log(onclickValue);
+                const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/);
+                if (match) {
+                  const extractedUrl = match[1];
+                  console.log('Extracted URL:', extractedUrl);
+                  mainWindow.loadURL(extractedUrl);
+                } else {
+                  console.log('No URL matched in onclick value.');
+                }
+              } else {
+                console.log('Button or onclick not found.');
+              }
+            }).catch(err => {
+              console.error('Error while executing JS:', err);
+            });
           }
-          else {
-            console.log('Cookie not found');
-            const menu = buildMenu(null);
-            Menu.setApplicationMenu(menu);
-          }
-        }).catch(err => {
-          console.error('Error reading cookie:', err);
-        });
-      }, 1000);
-    } else {
-      console.log('Did not match target URL, skipping cookie check.');
-      username = null;
-      const menu = buildMenu(username);
-      Menu.setApplicationMenu(menu);
+
+        } else {
+          console.log('Cookie not found, retrying...');
+          const menu = buildMenu(null);
+          Menu.setApplicationMenu(menu);
+          setTimeout(checkCookieAndRun, 1000); // retry after 1 sec
+        }
+      }).catch(err => {
+        console.error('Error reading cookie:', err);
+        setTimeout(checkCookieAndRun, 1000);
+      });
     }
+
+    checkCookieAndRun();
   });
+
 });
 
 
