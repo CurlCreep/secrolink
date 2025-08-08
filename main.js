@@ -1077,7 +1077,6 @@ function buildMenu() {
       submenu: [
         {
           label: 'Guide',
-          enabled: true,
           click: () => {
             if (mainWindow) {
               mainWindow.loadURL(guideUrl);
@@ -1310,7 +1309,7 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(buildMenu(null));
   nativeTheme.themeSource = currentTheme;
   updateMenu();
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // Minimize to tray if option is enabled
   mainWindow.on('close', (e) => {
