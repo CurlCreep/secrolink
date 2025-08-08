@@ -276,9 +276,9 @@ function buildMenu() {
         // Inventory
         {
           label: 'Inventory && Equipment',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(inventoryUrl);
             }
           }
@@ -289,9 +289,9 @@ function buildMenu() {
         // Bank
         {
           label: 'Bank',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(bankUrl);
             }
           }
@@ -300,9 +300,9 @@ function buildMenu() {
         // Crafting
         {
           label: 'Crafting',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(craftingUrl);
             }
           }
@@ -311,9 +311,9 @@ function buildMenu() {
         // Credit Shop
         {
           label: 'Credit Shop',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(creditShopUrl);
             }
           }
@@ -322,9 +322,9 @@ function buildMenu() {
         // Marketplace
         {
           label: 'Marketplace',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(marketplaceUrl);
             }
           }
@@ -333,9 +333,9 @@ function buildMenu() {
         // Storage
         {
           label: 'Storage',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(storageUrl);
             }
           }
@@ -344,9 +344,9 @@ function buildMenu() {
         // The Yard
         {
           label: 'The Yard',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(yardUrl);
             }
           }
@@ -355,9 +355,9 @@ function buildMenu() {
         // Vendor
         {
           label: 'Vendor',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(vendorUrl);
             }
           }
@@ -368,9 +368,9 @@ function buildMenu() {
         // Clan HQ
         {
           label: 'Clan HQ',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(clanUrl);
             }
           }
@@ -379,9 +379,9 @@ function buildMenu() {
         // Fast Travel
         {
           label: 'Fast Travel',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(teleportUrl);
             }
           }
@@ -390,9 +390,9 @@ function buildMenu() {
         // Gambling Den
         {
           label: 'Gambling Den',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(gamblingUrl);
             }
           }
@@ -401,9 +401,9 @@ function buildMenu() {
         // Meeting Hall
         {
           label: 'Meeting Hall',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(forumUrl);
             }
           }
@@ -412,9 +412,9 @@ function buildMenu() {
         // Records
         {
           label: 'Records',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(recordsUrl);
             }
           }
@@ -425,14 +425,14 @@ function buildMenu() {
     {
       label: 'Account',
       submenu: [
-        username ? { label: `Signed in as: ${username}`, enabled: false } : { label: 'Not signed in', enabled: false },
+        // username ? { label: `Signed in as: ${username}`, enabled: false } : { label: 'Not signed in', enabled: false },
 
         // Buddies
         {
           label: 'Friends',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(friendsUrl);
             }
           }
@@ -441,9 +441,9 @@ function buildMenu() {
         // Messages
         {
           label: 'Messages',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(messagesUrl);
             }
           }
@@ -452,10 +452,21 @@ function buildMenu() {
         // Challenges
         {
           label: 'Challenges',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(challengesUrl);
+            }
+          }
+        },
+
+        // Collection
+        {
+          label: 'Collection',
+          enabled: true,
+          click: () => {
+            if (mainWindow) {
+              mainWindow.loadURL(collectionUrl);
             }
           }
         },
@@ -463,9 +474,9 @@ function buildMenu() {
         // Masteries
         {
           label: 'Masteries',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(masteriesUrl);
             }
           }
@@ -476,9 +487,9 @@ function buildMenu() {
         // Profile Summary
         {
           label: 'Summary',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(summaryUrl);
             }
           }
@@ -487,9 +498,9 @@ function buildMenu() {
         // Stats
         {
           label: 'Show Stats',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(statsUrl);
             }
           }
@@ -498,21 +509,10 @@ function buildMenu() {
         // Posts
         {
           label: 'Show Posts',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(postsUrl);
-            }
-          }
-        },
-
-        // Collection
-        {
-          label: 'Collection Book',
-          enabled: !!username,
-          click: () => {
-            if (username && mainWindow) {
-              mainWindow.loadURL(collectionUrl);
             }
           }
         },
@@ -522,13 +522,13 @@ function buildMenu() {
         // Account settings
         {
           label: 'Account Settings',
-          enabled: !!username,
+          enabled: true,
           submenu: [
             {
               label: 'Edit Account Settings',
-              enabled: !!username,
+              enabled: true,
               click: () => {
-                if (username && mainWindow) {
+                if (mainWindow) {
                   mainWindow.loadURL(accountSettingsUrl);
                 }
               }
@@ -536,9 +536,9 @@ function buildMenu() {
             {
               // 2FA
               label: '2FA Settings',
-              enabled: !!username,
+              enabled: true,
               click: () => {
-                if (username && mainWindow) {
+                if (mainWindow) {
                   mainWindow.loadURL(TFAUrl);
                 }
               }
@@ -550,9 +550,9 @@ function buildMenu() {
         // Profile settings
         {
           label: 'Profile Settings',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(profileSettingsUrl);
             }
           }
@@ -561,9 +561,9 @@ function buildMenu() {
         // Message Options
         {
           label: 'Message Settings',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(messageSettingsUrl);
             }
           }
@@ -1077,9 +1077,9 @@ function buildMenu() {
       submenu: [
         {
           label: 'Guide',
-          enabled: !!username,
+          enabled: true,
           click: () => {
-            if (username && mainWindow) {
+            if (mainWindow) {
               mainWindow.loadURL(guideUrl);
             }
           }
@@ -1277,8 +1277,12 @@ function createTray() {
       mainWindow.setSkipTaskbar(false);
     }},
     { label: 'Quit', click: () => {
+      if (mainWindow) {
+        mainWindow.destroy(); // force close window
+      }
       tray.destroy();
-      app.quit();
+      app.quit(); // try normal quit
+      app.exit(0); // force exit if needed
     }}
   ]);
   tray.setToolTip('Secrolink');
@@ -1306,9 +1310,9 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(buildMenu(null));
   nativeTheme.themeSource = currentTheme;
   updateMenu();
-  // mainWindow.webContents.openDevTools();
-  
-  // Minimize to trey if option is enabled
+  mainWindow.webContents.openDevTools();
+
+  // Minimize to tray if option is enabled
   mainWindow.on('close', (e) => {
     if (minimizeToTray) {
       e.preventDefault();
@@ -1316,89 +1320,96 @@ app.whenReady().then(() => {
     }
   });
 
+  // Just checks cookie in the background
+  function checkCookieUntilFound() {
+    const currentUrl = mainWindow.webContents.getURL();
 
-
-  mainWindow.webContents.on('did-finish-load', () => {
-    function checkCookieAndRun() {
-      const currentUrl = mainWindow.webContents.getURL();
-      if (!currentUrl.includes('onlinezombiemmo')) {
-        console.log('Stopped: URL does not contain "onlinezombiemmo".');
-        username = null;
-        const menu = buildMenu(username);
-        Menu.setApplicationMenu(menu);
-        return;
-      }
-
-      session.defaultSession.cookies.get({
-        url: currentUrl,
-        name: 'lastLoginUser'
-      }).then(cookies => {
-        if (cookies.length > 0) {
-          username = cookies[0].value;
-          console.log('Username from cookie:', username);
-          const menu = buildMenu(username);
-          Menu.setApplicationMenu(menu);
-
-          if (oaNotification && !notificationSchedulerStarted) {
-            startNotificationScheduler();
-            notificationSchedulerStarted = true;
-          }
-
-          // Auto-revive
-          mainWindow.webContents.executeJavaScript(`
-            const buttons = document.querySelectorAll('.opElem');
-            for (const btn of buttons) {
-              if (btn.textContent.trim().toLowerCase() === 'revive') {
-                btn.click();
-                break;
-              }
-            }
-          `);
-
-          // Auto game launch
-          let automaticGameLaunch = store.get('automaticGameLaunch', false);
-          if (automaticGameLaunch && currentUrl.includes('page=21')) {
-            console.log('Leaving outpost');
-
-            mainWindow.webContents.executeJavaScript(`
-              (function() {
-                const btn = document.querySelector('button[onclick]');
-                return btn ? btn.getAttribute('onclick') : null;
-              })();
-            `).then(onclickValue => {
-              if (onclickValue) {
-                console.log(onclickValue);
-                const match = onclickValue.match(/window\.location\.href\s*=\s*"([^"]+)"/);
-                if (match) {
-                  const extractedUrl = match[1];
-                  console.log('Extracted URL:', extractedUrl);
-                  mainWindow.loadURL(extractedUrl);
-                } else {
-                  console.log('No URL matched in onclick value.');
-                }
-              } else {
-                console.log('Button or onclick not found.');
-              }
-            }).catch(err => {
-              console.error('Error while executing JS:', err);
-            });
-          }
-
-        } else {
-          console.log('Cookie not found, retrying...');
-          const menu = buildMenu(null);
-          Menu.setApplicationMenu(menu);
-          setTimeout(checkCookieAndRun, 1000); // retry after 1 sec
-        }
-      }).catch(err => {
-        console.error('Error reading cookie:', err);
-        setTimeout(checkCookieAndRun, 1000);
-      });
+    if (!currentUrl.includes('onlinezombiemmo')) {
+      console.log('Stopped cookie check: URL does not contain "onlinezombiemmo".');
+      username = null;
+      Menu.setApplicationMenu(buildMenu());
+      return;
     }
 
-    checkCookieAndRun();
-  });
+    session.defaultSession.cookies.get({
+      url: currentUrl,
+      name: 'lastLoginUser'
+    }).then(cookies => {
+      if (cookies.length > 0) {
+        username = cookies[0].value;
+        console.log('Username from cookie:', username);
+        Menu.setApplicationMenu(buildMenu());
+      } else {
+        console.log('Cookie not found, retrying...');
+        Menu.setApplicationMenu(buildMenu(null));
+        setTimeout(checkCookieUntilFound, 1000);
+      }
+    }).catch(err => {
+      console.error('Error reading cookie:', err);
+      setTimeout(checkCookieUntilFound, 1000);
+    });
+  }
 
+  // Runs game-related actions without waiting for the cookie
+  function runGameActions() {
+    const currentUrl = mainWindow.webContents.getURL();
+
+    if (!currentUrl.includes('onlinezombiemmo')) {
+      console.log('Not running game actions: wrong URL.');
+      return;
+    }
+
+    Menu.setApplicationMenu(buildMenu());
+
+    if (oaNotification && !notificationSchedulerStarted) {
+      startNotificationScheduler();
+      notificationSchedulerStarted = true;
+    }
+
+    // Auto-revive
+    mainWindow.webContents.executeJavaScript(`
+      const buttons = document.querySelectorAll('.opElem');
+      for (const btn of buttons) {
+        if (btn.textContent.trim().toLowerCase() === 'revive') {
+          btn.click();
+          break;
+        }
+      }
+    `);
+
+    // Auto game launch
+    let automaticGameLaunch = store.get('automaticGameLaunch', false);
+    if (automaticGameLaunch && currentUrl.includes('page=21')) {
+      console.log('Leaving outpost');
+
+      mainWindow.webContents.executeJavaScript(`
+        (function() {
+          const btn = document.querySelector('button[onclick]');
+          return btn ? btn.getAttribute('onclick') : null;
+        })();
+      `).then(onclickValue => {
+        if (onclickValue) {
+          const match = onclickValue.match(/window\\.location\\.href\\s*=\\s*"([^"]+)"/);
+          if (match) {
+            const extractedUrl = match[1];
+            console.log('Extracted URL:', extractedUrl);
+            mainWindow.loadURL(extractedUrl);
+          }
+        }
+      }).catch(err => {
+        console.error('Error while executing JS:', err);
+      });
+    }
+  }
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    // Start checking cookie in background
+    // checkCookieUntilFound();
+
+    // Immediately run game logic without waiting for cookie
+    runGameActions();
+  });
 });
+
 
 
