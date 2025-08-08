@@ -419,6 +419,22 @@ function buildMenu() {
             }
           }
         },
+        { type: 'separator' },
+        
+        // Inner City
+        {
+          label: 'Inner City',
+          click: () => {
+            mainWindow.webContents.executeJavaScript(`
+              if (typeof doPageChange === 'function') {
+                doPageChange(21, 1, false);
+              } else {
+                console.log('doPageChange not found yet.');
+              }
+            `);
+          }
+        }
+
       ]
     },
     // Account
