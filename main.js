@@ -58,23 +58,6 @@ function createWindow() {
 
   mainWin.loadURL(config.url);
 
-  mainWin.webContents.on('will-navigate', (event, url) => {
-    if (url.includes('index.php?action=logout')) {
-      console.log('User is logging out!');
-
-      // Clear the 'lastLoginUser' cookie for the site
-      const ses = mainWin.webContents.session;
-      ses.cookies.remove(config.lastUserUrl, config.lastUserCookie)
-        .then(() => {
-          console.log('lastLoginUser cookie deleted');
-          Menu.setApplicationMenu(buildMenu(null));
-        })
-        .catch(err => {
-          console.error('Failed to delete cookie:', err);
-        });
-    }
-  });
-
   mainWin.on('closed', () => {
     if (config.bossMapWindow && !config.bossMapWindow.isDestroyed()) {
       config.bossMapWindow.close();
