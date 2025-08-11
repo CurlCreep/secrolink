@@ -64,7 +64,6 @@ function startNotificationScheduler() {
 
     if (nextNotificationInMinutes !== null) {
       console.log(`Next notification in: ${nextNotificationInMinutes} minute(s)`);
-      showNotification();
     }
   }, 60 * 1000);
   config.notificationSchedulerStarted = true;
