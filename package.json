@@ -1,7 +1,7 @@
 {
   "name": "secrolink",
   "productName": "Secrolink",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Unofficial Dead Frontier 3D Desktop Client",
   "main": "main.js",
   "scripts": {
