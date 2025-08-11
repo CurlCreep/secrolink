@@ -8,7 +8,7 @@ function showNotification() {
   new Notification({
     title: 'Outpost is under attack!',
     body: 'Next outpost attack is in 3 hours.',
-    icon: path.join(__dirname, 'assets', 'icon.ico'),
+    icon: path.join(__dirname, '../../assets', 'icon.ico'),
   }).show();
 }
 
@@ -64,6 +64,7 @@ function startNotificationScheduler() {
 
     if (nextNotificationInMinutes !== null) {
       console.log(`Next notification in: ${nextNotificationInMinutes} minute(s)`);
+      showNotification();
     }
   }, 60 * 1000);
   config.notificationSchedulerStarted = true;
