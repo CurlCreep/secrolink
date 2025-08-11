@@ -371,7 +371,7 @@ function buildMenu() {
                 { label: 'Add New Account', click: () => addNewAccount() }
             ]
             },
-            { label: 'Logout', click: logout() },
+            { label: 'Logout', click: () => logout() },
         ]
         },
         // Tools

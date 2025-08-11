@@ -7,7 +7,6 @@ const { buildMenu } = require('./menu');
 
 function logout() {
     const mainWindow = getMainWindow();
-    console.log('fuck');
     if (!mainWindow) return;
 
     const ses = mainWindow.webContents.session;
